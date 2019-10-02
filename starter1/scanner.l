@@ -74,10 +74,16 @@ enum {
     LE,
     GT,
     GE,
+    ID,
+    INT,
+    FLOAT,
+    BOOL
+
 };
 
 
 #define yTRACE(x)    { if (traceScanner) fprintf(traceFile, "TOKEN %3d : %s\n", x, yytext); }
+#define yERROR(x)    { fprintf(errorFile, "\nLEXICAL ERROR, LINE %d: %s\n", yyline, x); errorOccurred = TRUE; yyterminate(); }
 
 /*
 Phase 2: This is parser generated h-file with definitions needed to sync
@@ -154,7 +160,41 @@ rsq/{DELIM}	{yTRACE(RSQ_F); return RSQ_F;}
 
 {WS}        { /* Your rules go below this rule and above EOF */ }
 
+"("	{yTRACE(LBRAC); return LBRAC;}
+")"	{yTRACE(RBRAC); return RBRAC;}
+"["	{yTRACE(LSBRAC); return LSBRAC;}
+"]"	{yTRACE(RSBRAC); return RSBRAC;}
+"{"	{yTRACE(LSCOPE); return LSCOPE;}
+"}"	{yTRACE(RSCOPE); return RSCOPE;}
 
+,	{yTRACE(COMMA); return COMMA;}
+;	{yTRACE(SEMICOLON); return SEMICOLON;}
+
+"+"	{yTRACE(PLUS); return PLUS;}
+"-"	{yTRACE(MINUS); return MINUS;}
+"*"	{yTRACE(MUL); return MUL;}
+"/"	{yTRACE(DIV); return DIV;}
+"^"	{yTRACE(POWER); return POWER;}
+
+=	{yTRACE(ASSIGN); return ASSIGN;}
+!	{yTRACE(NOT); return NOT;}
+&&	{yTRACE(AND); return AND;}
+"||"	{yTRACE(OR); return OR;}
+==	{yTRACE(EQ); return EQ;}
+!=	{yTRACE(NEQ); return NEQ;}
+"<"	{yTRACE(LT); return LT;}
+"<"=	{yTRACE(LE); return LE;}
+">"	{yTRACE(GT); return GT;}
+">"=	{yTRACE(GE); return GE;}
+
+[a-zA-Z_][a-zA-Z0-9_]* {
+				yTRACE(ID); return ID;
+		       }
+(true|false)/{DELIM}	{yTRACE(BOOL); return BOOL;}
+
+(([1-9][0-9]*)|0)/{DELIM}	{yTRACE(INT); return INT;}
+
+(([0-9]+"."[0-9]*)|([0-9]*"."[0-9]+))/{DELIM} {yTRACE(FLOAT); return FLOAT;}
 
 
 
